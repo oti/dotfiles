@@ -182,6 +182,7 @@ alias gft='git fetch tkg -p'
 alias gfpl='git fetch -p && gpl'
 alias grh='git reset --hard'
 alias gca='git commit --amend -C HEAD'
+alias gcan='git commit --amend -C HEAD'
 alias tigs='tig status'
 
 alias dsstore='find . -name '.DS_Store' -type f -ls -delete'
