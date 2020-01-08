@@ -138,6 +138,9 @@ export PATH=/usr/local/git/bin:$PATH
 export PATH=$PATH:$HOME/.ndenv/bin
 eval "$(ndenv init -)"
 
+#openssl
+export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
+
 #rbenv
 export PATH=$PATH:$HOME/.rbenv/bin
 eval "$(rbenv init -)"
