@@ -134,11 +134,6 @@ export CLICOLOR=1
 #git
 export PATH=/usr/local/git/bin:$PATH
 
-#ImageMagick
-export MAGICK_HOME="/usr/local/Cellar/imagemagick/7.0.8-8"
-export PATH="$MAGICK_HOME/bin:$PATH"
-export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
-
 #ndenv
 export PATH=$PATH:$HOME/.ndenv/bin
 eval "$(ndenv init -)"
