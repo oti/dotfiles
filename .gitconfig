@@ -1,0 +1,14 @@
+[core]
+	excludesfile = /Users/tkg/.gitignore_global
+[user]
+	name = oti
+	email = otiext@gmail.com
+[pull]
+	rebase = true
+[rebase]
+	autostash = true
+[alias]
+	cancel = !git commit -a -m 'Temporary commit for cancel' && git reset --hard HEAD~
+	ignore = update-index --assume-unchanged
+	unignore = update-index --no-assume-unchanged
+	ignored = !git ls-files -v | grep "^[a-z]"
