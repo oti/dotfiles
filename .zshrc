@@ -1,3 +1,26 @@
+typeset -U path PATH
+path=(
+	/opt/homebrew/bin(N-/)
+	/usr/local/bin(N-/)
+	$path
+)
+
+if [[ "${(L)$( uname -s )}" == darwin ]] && (( $+commands[arch] )); then
+	alias brew="arch -arch x86_64 /usr/local/bin/brew"
+	alias x64='exec arch -arch x86_64 "$SHELL"'
+	alias a64='exec arch -arch arm64e "$SHELL"'
+	switch-arch() {
+		if [[ "$(uname -m)" == arm64 ]]; then
+			arch=x86_64
+		elif [[ "$(uname -m)" == x86_64 ]]; then
+			arch=arm64e
+		fi
+		exec arch -arch $arch "$SHELL"
+	}
+fi
+
+setopt magic_equal_subst
+
 # 少し凝った zshrc
 # License : MIT
 # http://mollifier.mit-license.org/
@@ -7,7 +30,10 @@
 export LANG=ja_JP.UTF-8
 
 # zsh-completions
-fpath=(/usr/local/share/zsh-completions $fpath)
+fpath=(
+	/usr/local/share/zsh-completions(N-/)
+	$fpath
+)
 
 # 色を使用出来るようにする
 autoload -Uz colors
@@ -50,10 +76,9 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*' ignore-parents parent pwd ..
 
 # sudo の後ろでコマンド名を補完する
-zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
-                   /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
+zstyle ':completion:*:sudo:*' command-path /usr/local/sbin(N-/) /usr/local/bin(N-/) /usr/sbin(N-/) /usr/bin(N-/) /sbin(N-/) /bin(N-/) /usr/X11R6/bin(N-/)
 
-                   # ps コマンドのプロセス名補完
+# ps コマンドのプロセス名補完
 zstyle ':completion:*:processes' command 'ps x -o pid,s,args'
 
 ########################################
@@ -65,8 +90,8 @@ zstyle ':vcs_info:*' formats '%F{green}(%s)-[%b]%f'
 zstyle ':vcs_info:*' actionformats '%F{red}(%s)-[%b|%a]%f'
 
 function _update_vcs_info_msg() {
-    LANG=en_US.UTF-8 vcs_info
-    RPROMPT="${vcs_info_msg_0_}"
+		LANG=en_US.UTF-8 vcs_info
+		RPROMPT="${vcs_info_msg_0_}"
 }
 add-zsh-hook precmd _update_vcs_info_msg
 
@@ -118,32 +143,23 @@ bindkey '^R' history-incremental-pattern-search-backward
 # C で標準出力をクリップボードにコピーする
 # mollifier delta blog : http://mollifier.hatenablog.com/entry/20100317/p1
 if which pbcopy >/dev/null 2>&1 ; then
-    # Mac
-    alias -g C='| pbcopy'
+	# Mac
+	alias -g C='| pbcopy'
 elif which xsel >/dev/null 2>&1 ; then
-    # Linux
-    alias -g C='| xsel --input --clipboard'
+	# Linux
+	alias -g C='| xsel --input --clipboard'
 elif which putclip >/dev/null 2>&1 ; then
-    # Cygwin
-    alias -g C='| putclip'
+	# Cygwin
+	alias -g C='| putclip'
 fi
 
 export CLICOLOR=1
 
 # PATH #######################################
-#git
-export PATH=/usr/local/git/bin:$PATH
 
 #ndenv
 export PATH=$PATH:$HOME/.ndenv/bin
 eval "$(ndenv init -)"
-
-#openssl
-export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
-
-#rbenv
-export PATH=$PATH:$HOME/.rbenv/bin
-eval "$(rbenv init -)"
 
 # エイリアス #######################################
 alias ls='ls -G -F'
@@ -162,12 +178,14 @@ alias -g L='| less'
 alias -g G='| grep'
 
 alias restart="exec $SHELL -l"
-alias st='open -a "Sublime Text"'
-alias md='open -a "Typora"'
+alias o='open'
+alias md='open -a Typora'
 alias chrome='open -a "Google Chrome"'
 alias canary='open -a "Google Chrome Canary"'
 alias ff='open -a Firefox'
 alias sf='open -a Safari'
+alias vsc='open -a "Visual Studio Code - Insiders"'
+alias e='open -a "Visual Studio Code - Insiders" .'
 
 alias gpl='git pull'
 alias gps='git push'
@@ -179,49 +197,44 @@ alias gbm='git branch -M'
 alias gcp='git cherry-pick'
 alias gfp='git fetch -p'
 alias gft='git fetch tkg -p'
-alias gfpl='git fetch -p && gpl'
 alias gfu='git fetch upstream -p'
+alias gfpl='git fetch -p && gpl'
 alias grh='git reset --hard'
-alias gca='git commit --amend -C HEAD'
-alias gcan='git commit --amend -C HEAD'
-alias gsaferh='git cancel'
+alias gcane='git commit --amend --no-edit'
 alias tigs='tig status'
 
 alias dsstore='find . -name '.DS_Store' -type f -ls -delete'
-alias o='open'
-alias vsc='open -a "Visual Studio Code"'
-alias e='open -a "Visual Studio Code" .'
 
 # server ######################################
 function server() {
-  local port="${1:-8000}"
-  sleep 1 && open "http://localhost:${port}/" &
-  # Set the default Content-Type to `text/plain` instead of `application/octet-stream`
-  # And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
-  python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
+	local port="${1:-8000}"
+	sleep 1 && open "http://localhost:${port}/" &
+	# Set the default Content-Type to `text/plain` instead of `application/octet-stream`
+	# And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
+	python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
 }
 function server-sjis() {
-  local port="${1:-8000}"
-  sleep 1 && open "http://localhost:${port}/" &
-  python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=Shift_JIS";\nSimpleHTTPServer.test();' "$port"
+	local port="${1:-8000}"
+	sleep 1 && open "http://localhost:${port}/" &
+	python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=Shift_JIS";\nSimpleHTTPServer.test();' "$port"
 }
 
 # git差分抽出zip ######################################
 function git_diff_archive() {
-  local diff=""
-  local h="HEAD"
-  if [ $# -eq 1 ]; then
-    if expr "$1" : '[0-9]*$' > /dev/null ; then
-      diff="HEAD HEAD~${1}"
-    else
-      diff="HEAD ${1}"
-    fi
-  elif [ $# -eq 2 ]; then
-    diff="${1} ${2}"
-    h=$1
-  fi
-  if [ "$diff" != "" ]; then
-    diff="git diff --name-only ${diff}"
-  fi
-  git archive --format=zip --prefix=root/ $h `eval $diff` -o archive.zip
+	local diff=""
+	local h="HEAD"
+	if [ $# -eq 1 ]; then
+		if expr "$1" : '[0-9]*$' > /dev/null ; then
+			diff="HEAD HEAD~${1}"
+		else
+			diff="HEAD ${1}"
+		fi
+	elif [ $# -eq 2 ]; then
+		diff="${1} ${2}"
+		h=$1
+	fi
+	if [ "$diff" != "" ]; then
+		diff="git diff --name-only ${diff}"
+	fi
+	git archive --format=zip --prefix=root/ $h `eval $diff` -o archive.zip
 }
